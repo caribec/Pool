@@ -21,11 +21,19 @@ draw_options = pymunk.pygame_util.DrawOptions(screen)
 clock = pygame.time.Clock()
 FPS = 120
 
+#game variables
+dia = 36
+
 #colors
 BG = (50, 50, 50)
 
 #load images
 table_image = pygame.image.load("assets/images/table.png").convert_alpha()
+ball_images = []
+for i in range(1, 17):
+    ball_image = pygame.image.load(f"assets/images/ball_{i}.png").convert_alpha()
+    ball_images.append(ball_image)
+
 
 #function for creating balls
 def create_ball(radius,pos):
@@ -42,9 +50,20 @@ def create_ball(radius,pos):
     space.add(body, shape, pivot)
     return shape
 
-new_ball = create_ball(25, (300, 300))
-
-cue_ball = create_ball(25, (600, 310))
+#setup game balls
+balls = []
+rows = 5
+#potting balls
+for col in range(5):
+    for row in range(rows):
+        pos = (250 + (col * (dia + 1)), 267 + (row * (dia +1) + 1) + col * dia / 2)
+        new_ball = create_ball(dia / 2, pos)
+        balls.append(new_ball)
+    rows -=1
+#cue ball
+pos = (888, SCREEN_HEIGHT / 2)
+cue_ball = create_ball(dia / 2, pos)
+balls.append(cue_ball)
 
 #create pool table cushions
 cushions = [
@@ -82,6 +101,11 @@ while run:
     #draw pool table
     screen.blit(table_image, (0,0))
 
+    #draw pool balls
+    for i,  ball in enumerate(balls):
+        screen.blit(ball_images[i], (ball.body.position[0] - ball.radius, ball.body. position[1] - ball.radius))
+
+
 
    #event handler
     for event in pygame.event.get():
@@ -89,7 +113,7 @@ while run:
             cue_ball.body.apply_impulse_at_local_point((-1500, 0), (0, 0))
        if event.type == pygame.QUIT:
            run = False
-    space.debug_draw(draw_options)
+    #space.debug_draw(draw_options)
     pygame.display.update()
 
 
